@@ -1,7 +1,7 @@
 #include "PIDController.h"
 #include "Arduino.h"
 
-PIDController::PIDController(int Kp,int Ki, int Kd) {
+PIDController::PIDController(float Kp, float Ki, float Kd) {
   _Kp = Kp;
   _Ki = Ki;
   _Kd = Kd;
@@ -11,6 +11,15 @@ PIDController::PIDController(int Kp,int Ki, int Kd) {
   _Dval = 0;
   _previousError = 0;
   _previousI = 0;
+}
+
+void PIDController::resetValues() {
+	_error = 0;
+	_Pval = 0;
+	_Ival = 0;
+	_Dval = 0;
+	_previousError = 0;
+	_previousI = 0;
 }
 
 void PIDController::updateError(float error) {

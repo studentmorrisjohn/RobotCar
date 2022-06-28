@@ -10,10 +10,11 @@
 class PIDController {
   public:
     // Constructor
-    PIDController(int Kp, int Ki, int Kd);
+    PIDController(float Kp, float Ki, float Kd);
 
     // Methods
     float calculatePIDValue();
+    void resetValues();
     void updateError(float error);
     void changeConstants(float Kp, float Ki, float Kd);
     float getKp();
