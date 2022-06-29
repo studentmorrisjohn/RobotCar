@@ -33,12 +33,27 @@ void InputData::readSensors() {
 
 	if (_farSensors.hasLeft() || _farSensors.hasRight()) {
 		_trigger = TURN;
+		if (_farSensors.hasLeft() && _farSensors.hasRight()) {
+			_direction = LEFT;
+		}
+		if (_farSensors.hasLeft() && !_farSensors.hasRight()) {
+			_direction = LEFT;
+		}
+		if (!_farSensors.hasLeft() && _farSensors.hasRight()) {
+			_direction = STRAIGHT;
+		}
+
+		_error = 0;
+
+
 		return;
 	}
 
 	if (_lineFollower.noLine()) {
 		_trigger = TURN;
 		_direction = BACK;
+
+		_error = 0;
 		return;
 	}
 

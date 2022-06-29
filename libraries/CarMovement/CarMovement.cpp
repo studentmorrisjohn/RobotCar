@@ -60,13 +60,19 @@ void CarMovement::align(int error) {
 
 	_leftMotor.setMotorSpeed(_leftMotorSpeed, 0);
 	_rightMotor.setMotorSpeed(_rightMotorSpeed, 1);
+
+	Serial.println(pidValue);
 }
 
 void CarMovement::turn(int direction) {
+	stopCar();
+	delay(1000);
 	float totalTime = 0;
 	float currentTime = millis();
 	float previousTime = millis();
 	float error = 0;
+
+	
 
 	while (true) {
 		error = currentTime - previousTime;
