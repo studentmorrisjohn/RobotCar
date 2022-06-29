@@ -21,6 +21,9 @@ PIDController turnPID(0.0001, 0, 0);
 
 CarMovement carMovement(leftMotor, rightMotor, alignPID, turnPID);
 
+bool searching = false;
+int trigger, error, turnDirection;
+float currentTime, previousTime, timeInterval;
 const char* SSID  = "Wifi Sa Taas";
 const char* PWD = "pinkcharger";
 WebServer server(80);
@@ -47,6 +50,8 @@ void connectToWiFi() {
 void setup_routing() {
   server.enableCORS(true);
   server.on("/", test);
+  server.on("/start", startSearch);
+  server.on("/stop", stopSearch);
   server.on("/left", HTTP_POST, leftTest);
   server.on("/right", HTTP_POST, rightTest);
   server.on("/back", HTTP_POST, backTest);
@@ -60,6 +65,16 @@ void setup_routing() {
 
 void test() {
   server.send(200, "text/plain", "Hello there");
+}
+
+void startSearch() {
+  searching = true;
+  server.send(200, "text/plain", "Searching Started");
+}
+
+void stopSearch() {
+  searching = false;
+  server.send(200, "text/plain", "Searching Stopped");
 }
 
 void leftTest() {
@@ -170,6 +185,50 @@ void changeInitialAlignSpeed() {
   server.send(200, "text/plain", "Initial Follow Speed Changed");
 }
 
+void searchLoop() {
+  currentTime = millis();
+  previousTime = millis();
+  timeInterval = 10;
+  while (true) {
+    server.handleClient();
+    if (!searching) {
+      break;
+    }
+
+    currentTime = millis();
+
+    if (currentTime - previousTime > timeInterval) {
+      //trigger = inputData.getTrigger();
+      inputData.readSensors();
+      error = inputData.getError();
+      carMovement.align(error);
+      
+      
+//      if (trigger == FOLLOW_LINE) {
+//        error = inputData.getError();
+//        carMovement.align(error);
+//        continue;
+//      }
+//      
+//      if (trigger == TURN) {
+//        turnDirection = inputData.getDirection();
+//        carMovement.turn(turnDirection);
+//        continue; 
+//      }
+//      
+//      if (trigger == RED_DETECTED) {
+//        carMovement.stopCar();
+//        break;
+//      }
+
+      previousTime = currentTime;
+    }
+    
+
+    
+  }
+}
+
 void setup() {
   // put your setup code here, to run once:
   inputData.initialize();
@@ -188,4 +247,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   server.handleClient();
+
+  if (searching) {
+    searchLoop();
+  }
 }
