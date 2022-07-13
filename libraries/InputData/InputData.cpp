@@ -119,7 +119,7 @@ void InputData::readSensors() {
 			_direction = LEFT;
 		}
 		if (!_farSensors.hasLeft() && _farSensors.hasRight()) {
-			_direction = STRAIGHT;
+			_direction = MOVEALITTLE;
 		}
 
 		_error = 0;

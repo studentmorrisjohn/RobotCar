@@ -31,11 +31,7 @@ void Motor::setMotorSpeed(float motorSpeed, int dir) {
 
   if (abs(motorSpeed) < 200) {
   
-  if (abs(motorSpeed) == 0) {
-    motorSpeed = 0; 
-  } else {
-    motorSpeed = 200; 
-}
+    motorSpeed = 0;
 
   }
 

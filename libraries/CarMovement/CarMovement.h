@@ -27,6 +27,7 @@ public:
     void setTurnSideDelay(float turnSideDelay);
     void setTurnBackDelay(float turnBackDelay);
     void setForwardDelay(float forwardDelay);
+    void moveAnInch();
 
 private:
     Motor _leftMotor, _rightMotor;
