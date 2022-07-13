@@ -10,15 +10,20 @@
 #include <Motor.h>
 #include <CarMovement.h>
 #include <PIDController.h>
+#include <IkotIkotlang.h>
+#include <Wire.h>
+#include <Adafruit_TCS34725.h>
 
 LineFollower lineFollower(25,33,32,35,34);
 FarSensors farSensors(14, 27);
-InputData inputData(lineFollower, farSensors);
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+InputData inputData(lineFollower, farSensors, tcs);
+
 Motor leftMotor(19, 23, 2, 1);
 Motor rightMotor(5, 18, 4, 2);
 PIDController alignPID(3, 0, 0);
 PIDController turnPID(0.0001, 0, 0);
-
+IkotIkotlang alaAla;
 CarMovement carMovement(leftMotor, rightMotor, alignPID, turnPID);
 
 bool searching = false;
@@ -33,15 +38,15 @@ StaticJsonDocument<250> jsonDocument;
 void connectToWiFi() {
   Serial.print("Connecting to ");
   Serial.println(SSID);
-  
+
   WiFi.begin(SSID, PWD);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
     // we can even make the ESP32 to sleep
   }
- 
+
   Serial.print("Connected. IP: ");
   Serial.println(WiFi.localIP());
 
@@ -87,8 +92,8 @@ void leftTest() {
   float forwardDelay = jsonDocument["forward_delay"];
 
   Serial.println("data recieved");
-  Serial.print("turn delay: "); Serial.print(turnDelay); 
-  
+  Serial.print("turn delay: "); Serial.print(turnDelay);
+
   carMovement.setTurnSideDelay(turnDelay);
   carMovement.setForwardDelay(forwardDelay);
   carMovement.turn(LEFT);
@@ -106,8 +111,8 @@ void rightTest() {
   float forwardDelay = jsonDocument["forward_delay"];
 
   Serial.println("data recieved");
-  Serial.print("turn delay: "); Serial.print(turnDelay); 
-  
+  Serial.print("turn delay: "); Serial.print(turnDelay);
+
   carMovement.setTurnSideDelay(turnDelay);
   carMovement.setForwardDelay(forwardDelay);
   carMovement.turn(RIGHT);
@@ -122,7 +127,8 @@ void backTest() {
   deserializeJson(jsonDocument, body);
 
   float turnDelay = jsonDocument["delay"];
-  
+  Serial.println(turnDelay);
+
   carMovement.setTurnBackDelay(turnDelay);
   carMovement.turn(BACK);
 
@@ -173,7 +179,7 @@ void changeInitialTurnSpeed() {
 }
 
 void changeInitialAlignSpeed() {
-    if (server.hasArg("plain") == false) {
+  if (server.hasArg("plain") == false) {
   }
   String body = server.arg("plain");
   deserializeJson(jsonDocument, body);
@@ -198,34 +204,51 @@ void searchLoop() {
     currentTime = millis();
 
     if (currentTime - previousTime > timeInterval) {
-      //trigger = inputData.getTrigger();
-      inputData.readSensors();
-      error = inputData.getError();
-      carMovement.align(error);
-      
-      
-//      if (trigger == FOLLOW_LINE) {
-//        error = inputData.getError();
-//        carMovement.align(error);
-//        continue;
-//      }
-//      
-//      if (trigger == TURN) {
-//        turnDirection = inputData.getDirection();
-//        carMovement.turn(turnDirection);
-//        continue; 
-//      }
-//      
-//      if (trigger == RED_DETECTED) {
-//        carMovement.stopCar();
-//        break;
-//      }
+      trigger = inputData.getTrigger();
+      // inputData.readSensors();
+//      error = inputData.getError();
+//      carMovement.align(error);
+
+
+      if (trigger == FOLLOW_LINE) {
+        error = inputData.getError();
+        carMovement.align(error);
+        continue;
+      }
+
+      if (trigger == TURN) {
+        turnDirection = inputData.getDirection();
+
+        if (turnDirection == MOVEALITTLE) {
+          carMovement.stopCar();
+          delay(1000);
+          
+          carMovement.moveAnInch();
+          trigger = inputData.getTrigger();
+          
+
+          if (inputData.noLine()) {
+            carMovement.turn(RIGHT);
+            continue;
+          }
+
+          continue;
+        }
+        carMovement.turn(turnDirection);
+        continue;
+      }
+
+      if (trigger == RED_DETECTED) {
+        carMovement.stopCar();
+        searching = false;
+        break;
+      }
 
       previousTime = currentTime;
     }
-    
 
-    
+
+
   }
 }
 
