@@ -1,6 +1,10 @@
 #include "Motor.h"
 #include "Arduino.h"
-#include "esp32-hal-ledc.h"
+
+
+#if defined(ARDUINO_ARCH_ESP32)
+  #include "esp32-hal-ledc.h"
+#endif
 
 Motor::Motor(int pinA, int pinB, int pinPWM, int channel) {
   _motorPinA = pinA;
@@ -13,8 +17,14 @@ void Motor::initialize() {
   pinMode(_motorPinA, OUTPUT);
   pinMode(_motorPinB, OUTPUT);
 
-  ledcAttachPin(_motorPinPWM, _channel);
-  ledcSetup(_channel, 30000, 8);
+  
+
+  #if defined(ARDUINO_ARCH_ESP32)
+    ledcAttachPin(_motorPinPWM, _channel);
+    ledcSetup(_channel, 30000, 8);
+  #else
+    pinMode(_motorPinPWM, OUTPUT);
+  #endif
 }
 
 void Motor::setMotorSpeed(float motorSpeed, int dir) {
@@ -27,18 +37,16 @@ void Motor::setMotorSpeed(float motorSpeed, int dir) {
     digitalWrite(_motorPinB, LOW);
   }
 
-
-
-  if (abs(motorSpeed) < 200) {
-  
-    motorSpeed = 0;
-
-  }
-
   if (abs(motorSpeed) > 255) {
     motorSpeed = 255; 
   }
-  ledcWrite(_channel, motorSpeed);
+
+  #if defined(ARDUINO_ARCH_ESP32)
+    ledcWrite(_channel, motorSpeed);
+  #else
+    analogWrite(_motorPinPWM, motorSpeed);
+  #endif
+  
 }
 
 void Motor::stopMotor() {

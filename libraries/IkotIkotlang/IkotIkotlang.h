@@ -14,15 +14,21 @@ class IkotIkotlang {
     // Methods
     void addDirection(int direction);
     int getNextDirection();
-    void simplifyRoute(char* path, int pathLength);
+    void simplifyRoute();
     char getCharEquivalent(int direction);
     char* getPath();
-    char* sandwich(char* path, int pathLength, int b_index, char replacement);
-    int hasB(char* path, int pathLength);
+    int getPathLength();
+    char getDirection(int index);
+    char* sandwich();
+    int hasB();
     bool compareChar(char* first, char* second);
+    char getReplacement(char to_replace[3]);
   private:
-    char* _path;
+    char _path[100];
     int _pathLength;
+    int _b_index;
+    int _currentDirectionIndex;
+    char _replacement;
 };
 
 #endif

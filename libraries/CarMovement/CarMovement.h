@@ -28,12 +28,17 @@ public:
     void setTurnBackDelay(float turnBackDelay);
     void setForwardDelay(float forwardDelay);
     void moveAnInch();
+    void goBackALittle();
+    void turnLeft();
+    void turnRight();
+    void turnBack();
+    void waitasec();
 
 private:
     Motor _leftMotor, _rightMotor;
     PIDController _alignPID, _turnPID;
     float _followSpeed, _turnSpeed;
-    float _turnSideDelay, _turnBackDelay, _forwardDelay;
+    float _turnSideDelay, _turnBackDelay, _forwardDelay, _backwardDelay, _decisionDelay;
     float _leftMotorSpeed, _rightMotorSpeed;
 };
 

@@ -1,6 +1,5 @@
 #include "FarSensors.h"
 #include "Arduino.h"
-#include "esp32-hal-ledc.h"
 
 FarSensors::FarSensors(int farLeftPin, int farRightPin) {
 	_farLeftSensor = farLeftPin;

@@ -6,11 +6,13 @@
 
 CarMovement::CarMovement(Motor leftMotor, Motor rightMotor, PIDController alignPID, PIDController turnPID) :
 	_leftMotor(leftMotor), _rightMotor(rightMotor), _alignPID(alignPID), _turnPID(turnPID) {
-	_followSpeed = 200;
+	_followSpeed = 210;
 	_turnSpeed = 200;
-	_turnSideDelay = 500;
-	_turnBackDelay = 600;
-	_forwardDelay = 0;
+	_turnSideDelay = 850;
+	_turnBackDelay = 800;
+	_forwardDelay = 200;
+	_backwardDelay = 300;
+	_decisionDelay = 300;
 }
 
 void CarMovement::initialize() {
@@ -64,59 +66,123 @@ void CarMovement::align(int error) {
 	Serial.println(pidValue);
 }
 
-void CarMovement::moveAnInch() {
-	delay(_forwardDelay);
+void CarMovement::waitasec() {
+	stopCar();
+	delay(_decisionDelay);
 }
 
-void CarMovement::turn(int direction) {
-	stopCar();
-	delay(1000);
+void CarMovement::moveAnInch() {
+	// waitasec();
+	_leftMotor.setMotorSpeed(200, 0);
+	_rightMotor.setMotorSpeed(200, 1);
+	delay(_forwardDelay);
+	waitasec();
+}
+
+void CarMovement::goBackALittle() {
+	waitasec();
+	_leftMotor.setMotorSpeed(200, 1);
+	_rightMotor.setMotorSpeed(200, 0);
+	delay(_backwardDelay);
+	waitasec();
+}
+
+void CarMovement::turnLeft() {
+	moveAnInch();
+
 	float totalTime = 0;
 	float currentTime = millis();
 	float previousTime = millis();
 	float error = 0;
 
 	
-
 	while (true) {
+
 		error = currentTime - previousTime;
 		_turnPID.updateError(error);
 		float pidValue = _turnPID.calculatePIDValue();
 
-		if (direction == BACK) {
-			// if (error > _turnBackDelay) {
-			// 	stopCar();
-			// 	break;
-			// }
-
-			if (error > _turnBackDelay) {
-				Serial.println(_turnBackDelay);
-				stopCar();
-				break;
-			}
-
-			_leftMotorSpeed = _turnSpeed + pidValue;
-			_leftMotor.setMotorSpeed(_leftMotorSpeed, 0);
-			_rightMotor.setMotorSpeed(_leftMotorSpeed, 0);
-		} else {
-			if (error > _turnSideDelay) {
-				stopCar();
-				break;
-			}
-
-			if (direction == LEFT) {
-				_rightMotorSpeed = _turnSpeed + pidValue;
-				_rightMotor.setMotorSpeed(_rightMotorSpeed, 1);
-;			}
-
-			if (direction == RIGHT) {
-				_leftMotorSpeed = _turnSpeed + pidValue;
-				_leftMotor.setMotorSpeed(_leftMotorSpeed, 0);
-			}
+		if (error > _turnSideDelay) {
+			break;
 		}
 
+		_rightMotorSpeed = _turnSpeed + pidValue;
+		_rightMotor.setMotorSpeed(_rightMotorSpeed, 1);
+
+		
 		currentTime = millis();
 	}
 
-	delay(1000);
+	waitasec();
+}
+
+void CarMovement::turnRight() {
+	waitasec();
+
+	float totalTime = 0;
+	float currentTime = millis();
+	float previousTime = millis();
+	float error = 0;
+
+	
+	while (true) {
+
+		error = currentTime - previousTime;
+		_turnPID.updateError(error);
+		float pidValue = _turnPID.calculatePIDValue();
+
+		if (error > _turnSideDelay) {
+			break;
+		}
+
+		_leftMotorSpeed = _turnSpeed + pidValue;
+		_leftMotor.setMotorSpeed(_leftMotorSpeed, 0);
+
+		
+		currentTime = millis();
+	}
+
+	waitasec();
+}
+
+void CarMovement::turnBack() {
+	moveAnInch();
+
+	float totalTime = 0;
+	float currentTime = millis();
+	float previousTime = millis();
+	float error = 0;
+
+	
+	while (true) {
+
+		error = currentTime - previousTime;
+		_turnPID.updateError(error);
+		float pidValue = _turnPID.calculatePIDValue();
+
+		if (error > _turnBackDelay) {
+			break;
+		}
+
+		_leftMotorSpeed = _turnSpeed + pidValue;
+		_leftMotor.setMotorSpeed(_leftMotorSpeed, 0);
+		_rightMotor.setMotorSpeed(_leftMotorSpeed, 0);
+
+		
+		currentTime = millis();
+	}
+
+	waitasec();
+}
+
+void CarMovement::turn(int direction) {
+	if (direction == BACK) {
+		turnBack();
+	} else if (direction == LEFT) {
+		turnLeft();
+	} else if (direction == RIGHT) {
+		turnRight();
+	} else if (direction == STRAIGHT) {
+		moveAnInch();
+	}
 }

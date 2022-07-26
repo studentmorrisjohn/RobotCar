@@ -104,11 +104,7 @@ void InputData::readSensors() {
 	_lineFollower.readSensors();
 	_farSensors.readSensors();
 
-	if (hasRed()) {
-		_trigger = RED_DETECTED;
-		_error = 0;
-		return;
-	}
+
 
 	if (_farSensors.hasLeft() || _farSensors.hasRight()) {
 		_trigger = TURN;
@@ -129,6 +125,12 @@ void InputData::readSensors() {
 	}
 
 	if (_lineFollower.noLine()) {
+		// if (hasRed()) {
+		// 	_trigger = RED_DETECTED;
+		// 	_error = 0;
+		// 	return;
+		// }
+		
 		_trigger = TURN;
 		_direction = BACK;
 
