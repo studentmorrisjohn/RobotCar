@@ -29,10 +29,13 @@ public:
     void setForwardDelay(float forwardDelay);
     void moveAnInch();
     void goBackALittle();
+    void turnLeftALittle(int count);
+    void turnRightALittle(int count);
     void turnLeft();
     void turnRight();
     void turnBack();
     void waitasec();
+    void turnBackALittle();
 
 private:
     Motor _leftMotor, _rightMotor;

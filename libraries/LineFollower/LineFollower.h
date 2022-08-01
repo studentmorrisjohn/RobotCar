@@ -18,6 +18,7 @@ class LineFollower {
     void readSensors();
     bool noLine();
     bool hasIntersection();
+    bool hasMiddle();
 
   private:
     int _LFSensors[5] = {0,0,0,0,0};

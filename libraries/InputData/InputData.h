@@ -36,6 +36,9 @@ public:
     bool hasRed();
     bool noLine();
     bool hasIntersection();
+    bool hasLeft();
+    bool hasRight();
+    bool hasMiddle();
 
 private:
     LineFollower _lineFollower;

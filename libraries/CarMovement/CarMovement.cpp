@@ -6,11 +6,11 @@
 
 CarMovement::CarMovement(Motor leftMotor, Motor rightMotor, PIDController alignPID, PIDController turnPID) :
 	_leftMotor(leftMotor), _rightMotor(rightMotor), _alignPID(alignPID), _turnPID(turnPID) {
-	_followSpeed = 210;
+	_followSpeed = 205;
 	_turnSpeed = 200;
-	_turnSideDelay = 850;
-	_turnBackDelay = 800;
-	_forwardDelay = 200;
+	_turnSideDelay = 500;
+	_turnBackDelay = 500;
+	_forwardDelay = 300;
 	_backwardDelay = 300;
 	_decisionDelay = 300;
 }
@@ -60,9 +60,10 @@ void CarMovement::align(int error) {
 	_leftMotorSpeed = _followSpeed + pidValue;
 	_rightMotorSpeed = abs(-_followSpeed + pidValue);
 
-	_leftMotor.setMotorSpeed(_leftMotorSpeed, 0);
 	_rightMotor.setMotorSpeed(_rightMotorSpeed, 1);
+	_leftMotor.setMotorSpeed(_leftMotorSpeed, 0);
 
+	
 	Serial.println(pidValue);
 }
 
@@ -85,6 +86,28 @@ void CarMovement::goBackALittle() {
 	_rightMotor.setMotorSpeed(200, 0);
 	delay(_backwardDelay);
 	waitasec();
+}
+
+void CarMovement::turnBackALittle() {
+	_leftMotor.setMotorSpeed(_turnSpeed, 0);
+	_rightMotor.setMotorSpeed(150, 0);
+
+	delay(10);
+}
+
+void CarMovement::turnLeftALittle(int count) {
+
+	_rightMotor.setMotorSpeed(_turnSpeed, 1);
+
+	delay(10);
+}
+
+void CarMovement::turnRightALittle(int count) {
+
+	_leftMotor.setMotorSpeed(_turnSpeed, 0);
+	_rightMotor.setMotorSpeed(100, 1);
+
+	delay(10);
 }
 
 void CarMovement::turnLeft() {
@@ -112,12 +135,9 @@ void CarMovement::turnLeft() {
 		
 		currentTime = millis();
 	}
-
-	waitasec();
 }
 
 void CarMovement::turnRight() {
-	waitasec();
 
 	float totalTime = 0;
 	float currentTime = millis();
@@ -137,12 +157,11 @@ void CarMovement::turnRight() {
 
 		_leftMotorSpeed = _turnSpeed + pidValue;
 		_leftMotor.setMotorSpeed(_leftMotorSpeed, 0);
+		_rightMotor.setMotorSpeed(100, 1);
 
 		
 		currentTime = millis();
 	}
-
-	waitasec();
 }
 
 void CarMovement::turnBack() {
@@ -171,8 +190,6 @@ void CarMovement::turnBack() {
 		
 		currentTime = millis();
 	}
-
-	waitasec();
 }
 
 void CarMovement::turn(int direction) {

@@ -100,6 +100,18 @@ bool InputData::hasRed() {
 	return readColor();
 }
 
+bool InputData::hasRight() {
+	return _farSensors.hasRight();
+}
+
+bool InputData::hasLeft() {
+	return _farSensors.hasLeft();
+}
+
+bool InputData::hasMiddle() {
+	return _lineFollower.hasMiddle();
+}
+
 void InputData::readSensors() {
 	_lineFollower.readSensors();
 	_farSensors.readSensors();

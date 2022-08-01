@@ -47,3 +47,7 @@ bool LineFollower::noLine() {
 bool LineFollower::hasIntersection() {
     return (_LFSensors[0] == 1) && (_LFSensors[1] == 1) && (_LFSensors[2] == 1) && (_LFSensors[3] == 1) && (_LFSensors[4] == 1);
 }
+
+bool LineFollower::hasMiddle() {
+  return _LFSensors[2];
+}
