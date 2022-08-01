@@ -29,8 +29,6 @@ CarMovement carMovement(leftMotor, rightMotor, alignPID, turnPID);
 bool carIsRunning = false, doneSearch = false;
 int trigger, error, turnDirection;
 float currentTime, previousTime, timeInterval;
-//const char* SSID  = "Wifi Sa Taas";
-//const char* PWD = "pinkcharger";
 
 const char* SSID  = "robot";
 const char* PWD = "password";
@@ -68,11 +66,6 @@ void setup_routing() {
   server.on("/left", leftTest);
   server.on("/right", rightTest);
   server.on("/back", backTest);
-  server.on("/turnpid", HTTP_POST, changeTurnPIDConstants);
-  server.on("/alignpid", HTTP_POST, changeAlignPIDConstants);
-  server.on("/turnspeed", HTTP_POST, changeInitialTurnSpeed);
-  server.on("/alignspeed", HTTP_POST, changeInitialAlignSpeed);
-
   server.begin();
 }
 
@@ -111,81 +104,17 @@ void backTest() {
   server.send(200, "text/plain", "Finished Turning Back");
 }
 
-void changeTurnPIDConstants() {
-  if (server.hasArg("plain") == false) {
-  }
-  String body = server.arg("plain");
-  deserializeJson(jsonDocument, body);
-
-  float Kp = jsonDocument["proportional"];
-  float Ki = jsonDocument["integral"];
-  float Kd = jsonDocument["differential"];
-
-  carMovement.changeTurnConstants(Kp, Ki, Kd);
-
-  server.send(200, "text/plain", "Turn Constants Changed");
-}
-
-void changeAlignPIDConstants() {
-  if (server.hasArg("plain") == false) {
-  }
-  String body = server.arg("plain");
-  deserializeJson(jsonDocument, body);
-
-  float Kp = jsonDocument["proportional"];
-  float Ki = jsonDocument["integral"];
-  float Kd = jsonDocument["differential"];
-
-  carMovement.changeAlignConstants(Kp, Ki, Kd);
-
-  server.send(200, "text/plain", "Align Constants Changed");
-}
-
-void changeInitialTurnSpeed() {
-  if (server.hasArg("plain") == false) {
-  }
-  String body = server.arg("plain");
-  deserializeJson(jsonDocument, body);
-
-  float _speed = jsonDocument["speed"];
-
-  carMovement.setTurnSpeed(_speed);
-
-  server.send(200, "text/plain", "Initial Turn Speed Changed");
-}
-
-void changeInitialAlignSpeed() {
-  if (server.hasArg("plain") == false) {
-  }
-  String body = server.arg("plain");
-  deserializeJson(jsonDocument, body);
-
-  float _speed = jsonDocument["speed"];
-
-  carMovement.setFollowSpeed(_speed);
-
-  server.send(200, "text/plain", "Initial Follow Speed Changed");
-}
 
 void getPath() {
   String path = alaAla.getPath();
   server.send(200, "text/plain", path);
 }
 
-//const int buttonPin = 15;
-//int buttonReading;
-
 void searchLoop() {
   currentTime = millis();
   previousTime = millis();
   timeInterval = 10;
   while (true) {
-//    Serial.println("searching");
-//    buttonReading = digitalRead(buttonPin);
-//
-//    if (buttonReading) {
-//      carIsRunning = false;
-//    }
 
     server.handleClient();
 
@@ -399,7 +328,6 @@ void setup() {
   // put your setup code here, to run once:
   inputData.initialize();
   carMovement.initialize();
-  // pinMode(buttonPin, INPUT);
 
   Serial.begin(9600);
 
@@ -419,13 +347,6 @@ void loop() {
   inputData.readSensors();
   Serial.println(inputData.getError());
 
-
-
-//  buttonReading = digitalRead(buttonPin);
-//
-//  if (buttonReading) {
-//    carIsRunning = true;
-//  }
   
   
   if (carIsRunning&& !doneSearch) {
