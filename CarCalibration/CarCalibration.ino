@@ -29,8 +29,8 @@ CarMovement carMovement(leftMotor, rightMotor, alignPID, turnPID);
 bool searching = false;
 int trigger, error, turnDirection;
 float currentTime, previousTime, timeInterval;
-const char* SSID  = "Wifi Sa Taas";
-const char* PWD = "pinkcharger";
+const char* SSID  = "insert wifi name";
+const char* PWD = "insert wifi password";
 WebServer server(80);
 StaticJsonDocument<250> jsonDocument;
 
